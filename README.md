@@ -17,7 +17,7 @@
 
 ## Build (Android Studio)
 
-1. Open this folder in a recent Android Studio version that supports **Android Gradle Plugin 9.4.0**, **Kotlin 2.4.20**, and the **Android API 37 SDK**. Use **JDK 17**. Install Android API 37 under SDK Manager if required.
+1. Open this folder in a recent Android Studio version that supports **Android Gradle Plugin 9.4.0**, **Kotlin 2.4.20**, and the **Android API 36 SDK**. Use **JDK 17**. Install Android API 36 under SDK Manager if required.
 2. Sync Gradle. Build with **Build > Build APK(s)** or via `gradle :app:assembleDebug` with Gradle 9.7.1 (see wrapper note below).
 3. Install `app/build/outputs/apk/debug/app-debug.apk` on a connected Wear OS emulator/watch (Android Studio or `adb install -r ...`). This package uses `dev.tomatowear.app` and can coexist with the original Tomato phone app.
 4. On Android 13+ watches, allow **Notifications** for completion and countdown notifications. On Android 12+ watches allow **Alarms & reminders** from the Settings screen for timely timer completion during Doze.
