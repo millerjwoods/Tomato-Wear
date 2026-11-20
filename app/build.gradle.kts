@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "dev.tomatowear.app"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "dev.tomatowear.app"
