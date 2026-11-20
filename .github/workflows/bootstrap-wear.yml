@@ -1,4 +1,4 @@
-name: Bootstrap Tomato Wear and build Wear OS APK
+name: Build Tomato Wear OS APK
 
 on:
   push:
@@ -9,23 +9,25 @@ permissions:
   contents: write
 
 jobs:
-  bootstrap-and-build:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - name: Expand and commit Tomato Wear source
+      - name: Import app source once, without changing workflows
         run: |
           set -euxo pipefail
-          test -f .source/tomato-wear-source.tar.xz
-          tar -xJf .source/tomato-wear-source.tar.xz -C .
-          rm -rf .source
-          git add -A
-          if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Import complete Tomato Wear OS source'
-            git push origin HEAD:main
+          if test -f .source/tomato-wear-source.tar.xz; then
+            tar -xJf .source/tomato-wear-source.tar.xz -C .
+            rm -rf .source
+            rm -f .github/workflows/wear-debug-apk.yml
+            git add -A -- . ':!.github/workflows'
+            if ! git diff --cached --quiet; then
+              git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Import complete Tomato Wear OS source'
+              git push origin HEAD:main
+            fi
           fi
       - name: Install Java 17
         uses: actions/setup-java@v4
