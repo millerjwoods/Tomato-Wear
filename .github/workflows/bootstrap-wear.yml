@@ -1,0 +1,54 @@
+name: Bootstrap Tomato Wear and build Wear OS APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Expand and commit Tomato Wear source
+        run: |
+          set -euxo pipefail
+          test -f .source/tomato-wear-source.tar.xz
+          tar -xJf .source/tomato-wear-source.tar.xz -C .
+          rm -rf .source
+          git add -A
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Import complete Tomato Wear OS source'
+            git push origin HEAD:main
+          fi
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android API 37
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-37' 'build-tools;37.0.0'
+      - name: Install Gradle 9.7.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.7.1'
+      - name: Run unit tests
+        run: gradle :app:testDebugUnitTest --stacktrace
+      - name: Build Wear OS debug APK
+        run: gradle :app:assembleDebug --stacktrace
+      - name: Upload installable debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tomato-wear-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
